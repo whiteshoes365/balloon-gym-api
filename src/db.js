@@ -2,11 +2,24 @@ import pg from 'pg';
 
 const { Pool } = pg;
 
+const url = process.env.DATABASE_URL ?? '';
+const needsSsl = /render\.com|supabase\.(co|com)/.test(url);
+// Optional schema (e.g. DB_SCHEMA=balloon_gym on Supabase). Use the Supabase
+// *session* pooler (port 5432) so the per-connection search_path sticks.
+const schema = process.env.DB_SCHEMA;
+if (schema && !/^[a-z_][a-z0-9_]*$/.test(schema)) throw new Error('invalid DB_SCHEMA');
+
 export const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_URL?.includes('render.com') ? { rejectUnauthorized: false } : undefined,
+  connectionString: url,
+  ssl: needsSsl ? { rejectUnauthorized: false } : undefined,
   max: 5,
 });
+
+if (schema) {
+  pool.on('connect', (client) => {
+    client.query(`SET search_path TO ${schema}`).catch((err) => console.error('search_path failed', err.message));
+  });
+}
 
 export async function migrate() {
   await pool.query(`

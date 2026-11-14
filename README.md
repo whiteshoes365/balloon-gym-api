@@ -12,7 +12,8 @@ Leaderboard backend for the "풍선쳐라 운동해라" Toss mini-app.
 
 ## Env vars
 
-- `DATABASE_URL` — Postgres connection string.
+- `DATABASE_URL` — Postgres connection string. On Supabase use the session pooler (port 5432).
+- `DB_SCHEMA` — optional schema for the tables (Supabase: `balloon_gym`).
 - `PORT` — set by Render automatically.
 
 ## Local dev
