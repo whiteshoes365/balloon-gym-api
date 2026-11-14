@@ -6,7 +6,6 @@ import { corsOptions } from './cors.js';
 import { sanitizeNickname, isValidUserId } from './nickname.js';
 import { validateSubmission } from './anticheat.js';
 import { isoWeekKeyKST } from './kst.js';
-import { exportDump } from './exportDump.js';
 
 const app = express();
 app.use(cors(corsOptions));
@@ -138,7 +137,6 @@ app.use((err, _req, res, _next) => {
 const PORT = Number(process.env.PORT) || 8080;
 
 migrate()
-  .then(exportDump)
   .then(() => {
     app.listen(PORT, () => console.log(`balloon-gym-api listening on ${PORT}`));
   })
